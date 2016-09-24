@@ -1,0 +1,12 @@
+doctype html
+html(lang="en")
+    head
+        title=pageTitle
+    body
+        h1 Type : #{error.type}
+        h2 Message : #{error.message}
+        h3 Status code : #{error.code}
+        h4 Details : #{error.detail}
+        #container
+            each stack in error.stack.split('\n')
+                span #{stack} <br>
