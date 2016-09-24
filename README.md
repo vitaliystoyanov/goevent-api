@@ -9,8 +9,8 @@ To get you started you can simply clone this repository and install the dependen
 Clone the notification-event-service repository using git:
 
 ```
-git clone 
-cd 
+git clone https://github.com/melyourhero/goevent-api
+cd goevent-api
 ```
 
 ### Install Dependencies
@@ -35,7 +35,6 @@ src/redis-server
 **In the root folder type:**
 
 ```
-cd 
 npm start 
 ```
 
