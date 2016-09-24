@@ -1,4 +1,4 @@
-# Event notification service
+# Search events service
 
 This is a REST API for event notifications. This app created to help people quickly find interesting activities depending on the location (person or selected manually). With this service you are always updated with the latest events for every taste.
 
