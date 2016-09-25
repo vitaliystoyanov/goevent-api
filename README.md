@@ -51,7 +51,7 @@ Now try to do ajax request to the app at `http://localhost:8000/`
 
 * ##URL
  
-  /v1/events/
+  /v1.0/events/
 
 * ###Method:
   
@@ -113,7 +113,7 @@ Now try to do ajax request to the app at `http://localhost:8000/`
   
 * ##URL
  
-  /v1/events/:id
+  /v1.0/events/:id
 
 * ###Method:
   
@@ -171,7 +171,7 @@ Now try to do ajax request to the app at `http://localhost:8000/`
   
 * ##URL
  
-  /v1/events-location/
+  /v1.0/events-location/
 
 * ###Method:
   
@@ -235,7 +235,7 @@ Now try to do ajax request to the app at `http://localhost:8000/`
   
 * ##URL
  
-  /v1/user/user-events
+  /v1.0/user/user-events
 
 * ###Method:
   
@@ -292,7 +292,7 @@ Now try to do ajax request to the app at `http://localhost:8000/`
   
 * ##URL
  
-  /v1/user/new-event
+  /v1.0/user/new-event
 
 * ###Method:
   
