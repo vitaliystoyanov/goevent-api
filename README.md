@@ -51,7 +51,7 @@ Now try to do ajax request to the app at `http://localhost:8000/`
 
 * ##URL
  
-  /v1.0/events/
+  /v1.0/events
 
 * ###Method:
   
@@ -171,7 +171,7 @@ Now try to do ajax request to the app at `http://localhost:8000/`
   
 * ##URL
  
-  /v1.0/events-location/
+  /v1.0/events-location
 
 * ###Method:
   
