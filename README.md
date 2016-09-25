@@ -38,6 +38,13 @@ src/redis-server
 npm start 
 ```
 
+Note: if you are using windows, you should run the server with the following commands in the console:
+
+```
+set NODE_PATH=.
+nodemon server
+```
+
 Now try to do ajax request to the app at `http://localhost:8000/`
 
 #API Specs:
