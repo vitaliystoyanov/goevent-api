@@ -19,4 +19,3 @@ cors.getCrossOriginRequest = (req, res, next) => {
     // Pass to next layer of middleware
     next();
 };
-

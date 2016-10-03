@@ -1,4 +1,4 @@
-const requestPromise = require('libs/request-promise');
+const requestPromise = require('libs/request-promise').requestPromise;
 const log = require('libs/log').getLogger(module);
 const config = require('config');
 const currentDate = require('helpers/currentDate').getCurrentDate();

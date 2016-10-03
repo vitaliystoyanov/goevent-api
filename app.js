@@ -14,15 +14,15 @@ app.api = db => {
     const morgan = require('morgan');
     const config = require('./config');
 
-    // Routes
+    // routes
     const eventRouter = require('./routes/facebook');
     const userRouter = require('./routes/user');
 
-    // Helpers
+    // helpers
     const eventUpdater = require('./helpers/eventUpdater').updater;
     const ApplicationError = require('helpers/applicationError');
 
-    // Middlewares
+    // middlewares
     const changeHeader = require('./middlewares/changeHeader').getChangeHeader;
     const cors = require('./middlewares/crossOriginRequest').getCrossOriginRequest;
 
@@ -37,15 +37,15 @@ app.api = db => {
         store: sessionStore.connection(db)
     };
 
-    // Setting up static files
+    // setting up static files
     // app.use(express.static(path.join(__dirname.split('/').splice(0, 6).join('/'), '/frontend/build')));
 
-    // View engine setup
+    // view engine setup
     app.engine('jade', require('jade').renderFile);
     app.set('views', path.join(__dirname, '/views'));
     app.set('view engine', 'jade');
 
-    // All environments
+    // all environments
     app.use(cors);
     app.use(changeHeader);
     app.use(bodyParser.urlencoded({extended: false}));
@@ -56,11 +56,11 @@ app.api = db => {
     app.use(passport.session());
     app.use(morgan(tiny));
 
-    // Setting up a routers
+    // setting up a routers
     app.use('/v1.0', eventRouter);
     app.use('/v1.0/user', userRouter);
 
-    // Catch 404 and forward to error handler
+    // catch 404 and forward to error handler
     app.use((req, res, next) => {
         let errorOptions = {
             type: 'Application error',
@@ -73,7 +73,7 @@ app.api = db => {
         next(error);
     });
 
-    // Development error handler will print stacktrace
+    // development error handler will print stacktrace
     if (app.get('env') === 'development') {
         app.use((error, req, res, next) => {
             res.status(error.status || 500);
@@ -83,7 +83,7 @@ app.api = db => {
         });
     }
 
-    // Production error handler no stacktraces leaked to user
+    // production error handler no stacktraces leaked to user
     app.use((error, req, res, next) => {
         res.status(error.status || 500);
         res.render('error', {
@@ -96,6 +96,3 @@ app.api = db => {
 };
 
 module.exports = app;
-
-
-

@@ -10,38 +10,60 @@ const ApplicationError = require('helpers/applicationError').createApplicationEr
 const eventRouter = express.Router();
 const client = redis.createClient();
 
+let redisConnection = false;
+
 client
-    .on('ready', () => log.info('Redis successfully connect'))
+    .on('ready', () => {
+        redisConnection = true;
+        log.info('Redis successfully connect');
+    })
     .on('end', () => log.info('Redis connection closed'))
-    .on('error', error => log.error(`Redis error. ${error}`));
+    .on('error', error => {
+        redisConnection = false;
+        log.error(`Redis error. ${error}`);
+    });
 
 eventRouter.get('/events', (req, res) => {
     let pagination = {};
     let fields;
     let query = {};
     let data = {};
+    let errorOptions = {};
 
     pagination.skip = (req.query.offset ? req.query.offset : null);
     pagination.limit = (req.query.limit ? req.query.limit : null);
     fields = (req.query.fields ? req.query.fields : null);
     fields = (fields === null ? {} : fields.replace(/,/g, ' '));
 
-    if(req.user) log.info(req.user.id);
-
-
-    if (!(pagination.skip && pagination.limit)) {
+    // if redis connected successfully
+    if (redisConnection) {
         client.get('db_events', (error, value) => {
 
+            // if something gone wrong
             if (error) {
-                return log.error(error);
+                errorOptions = {
+                    type: "Internal Server Error",
+                    code: 404,
+                    message: "Not Found",
+                    detail: "What you are looking for was not found. ".concat(error.message),
+                };
+                res.json(ApplicationError(errorOptions));
+                return log.error(ApplicationError(errorOptions));
             }
 
-            // Check if cache is not cashed
+            // check if cache is not cashed
             if (!value) {
                 Event.find({}, fields, {}, (error, response) => {
 
                     if (error) {
-                        return log.error(error);
+                        errorOptions = {
+                            type: "Internal Server Error",
+                            code: 500,
+                            message: "Internal error",
+                            detail: "Problem with request to database. ".concat(error.message),
+                        };
+                        res.json(ApplicationError(errorOptions));
+                        return log.error(ApplicationError(errorOptions));
                     }
 
                     Event.count({}, (error, count) => {
@@ -50,11 +72,18 @@ eventRouter.get('/events', (req, res) => {
                         log.info('Response from database query');
                         res.json(data);
 
-                        // Cache into redis
+                        // cache into redis
                         client.set('db_events', JSON.stringify(data), error => {
 
                             if (error) {
-                                return log.error(error);
+                                errorOptions = {
+                                    type: "Internal Server Error",
+                                    code: 500,
+                                    message: "Internal error",
+                                    detail: "Problem with caching data to memory. ".concat(error.message),
+                                };
+                                res.json(ApplicationError(errorOptions));
+                                return log.error(ApplicationError(errorOptions));
                             }
 
                             // Expire query in 40 seconds
@@ -64,20 +93,31 @@ eventRouter.get('/events', (req, res) => {
                     });
                 });
             } else {
+                // get data from memory cache
                 log.info('Data from cache');
                 res.json(JSON.parse(value));
             }
         });
+
+        // if redis connected failure
     } else {
         Event.find(query, fields, pagination, (error, response) => {
 
             if (error) {
-                return log.error(error);
+                errorOptions = {
+                    type: "Internal Server Error",
+                    code: 500,
+                    message: "Internal error",
+                    detail: "Problem with request to database, when pass parameters. ".concat(error.message),
+                };
+                res.json(ApplicationError(errorOptions));
+                return log.error(ApplicationError(errorOptions));
             }
 
-            Event.count({}, (err, count) => {
+            Event.count({}, (error, count) => {
                 data.events = response;
                 data.count = count;
+                log.info('Response from database query, without caching');
                 res.json(data);
             });
         });

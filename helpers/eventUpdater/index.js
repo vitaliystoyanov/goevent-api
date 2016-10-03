@@ -5,11 +5,11 @@ const ApplicationError = require('helpers/applicationError').createApplicationEr
 const log = require('libs/log').getLogger(module);
 const uniqueEvents = require('helpers/uniqueEvents').uniqueEvents;
 
-// Date of permanent updating of the database
+// date of permanent updating of the database
 const DATE_SCHEDULE = {
-    hour: 12,
-    minute: 0,
-    dayOfWeek: 2
+    hour: 20,
+    minute: 39,
+    dayOfWeek: 6
 };
 
 /**
@@ -69,10 +69,12 @@ const deleteAllEvents = () => {
 };
 
 /**
- * Makes database updates every week at 23:00 Sunday
+ * Makes database updates every week at Time[XX(hourse):XX(minutes)] and [day of week]
  */
 let updater = schedule.scheduleJob(DATE_SCHEDULE, () => {
     let searchResponse = {};
+
+    console.log('updater works...');
 
     searchEvents()
         .then(response => {

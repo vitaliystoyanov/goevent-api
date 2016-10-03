@@ -17,4 +17,4 @@ api.server = api.app.listen(config.get('port'), () => {
     log.info(`Connecting on port : ${config.get('port')}`);
 }).on('listening', onListening).on('error', onError);
 
-module.exports = api;
+module.exports = api.server;

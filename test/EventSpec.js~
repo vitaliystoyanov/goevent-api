@@ -16,16 +16,7 @@ describe('GET /events', () => {
             });
     });
 
-    it('should return limit of events by offset', (done) => {
-        supertest(app)
-            .get('/v1.0/events?offset=0&limit=50')
-            .expect(200)
-            .end((error, res) => {
-                res.status.should.equal(200);
-                res.body.events.should.have.length(50);
-                done();
-            });
-    });
+
 
     it('should return an error for a invalid event id', (done) => {
         let id = 11111111111111111;
