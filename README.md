@@ -1,4 +1,4 @@
-# Event notification service
+# Search events service
 
 This is a REST API for event notifications. This app created to help people quickly find interesting activities depending on the location (person or selected manually). With this service you are always updated with the latest events for every taste.
 
@@ -9,8 +9,8 @@ To get you started you can simply clone this repository and install the dependen
 Clone the notification-event-service repository using git:
 
 ```
-git clone 
-cd 
+git clone https://github.com/melyourhero/goevent-api
+cd goevent-api
 ```
 
 ### Install Dependencies
@@ -35,8 +35,14 @@ src/redis-server
 **In the root folder type:**
 
 ```
-cd 
 npm start 
+```
+
+Note: if you are using windows, you should run the server with the following commands in the console:
+
+```
+set NODE_PATH=.
+nodemon server
 ```
 
 Now try to do ajax request to the app at `http://localhost:8000/`
@@ -45,7 +51,7 @@ Now try to do ajax request to the app at `http://localhost:8000/`
 
 * ##URL
  
-  /v1/events/
+  /v1.0/events
 
 * ###Method:
   
@@ -107,7 +113,7 @@ Now try to do ajax request to the app at `http://localhost:8000/`
   
 * ##URL
  
-  /v1/events/:id
+  /v1.0/events/:id
 
 * ###Method:
   
@@ -165,7 +171,7 @@ Now try to do ajax request to the app at `http://localhost:8000/`
   
 * ##URL
  
-  /v1/events-location/
+  /v1.0/events-location
 
 * ###Method:
   
@@ -229,7 +235,7 @@ Now try to do ajax request to the app at `http://localhost:8000/`
   
 * ##URL
  
-  /v1/user/user-events
+  /v1.0/user/user-events
 
 * ###Method:
   
@@ -286,7 +292,7 @@ Now try to do ajax request to the app at `http://localhost:8000/`
   
 * ##URL
  
-  /v1/user/new-event
+  /v1.0/user/new-event
 
 * ###Method:
   
