@@ -1,5 +1,4 @@
 global.api = {};
-// api.http = require('http');
 
 const db = require('./db');
 api.app = require('./app').api(db);
