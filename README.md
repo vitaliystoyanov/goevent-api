@@ -97,7 +97,7 @@ Now try to do ajax request to the app at `http://localhost:8000/`
 
 * ###Error Response:
 
-  Code: 404 Not found  
+  Code: 400 Bad Request   
 
 * ###Sample Call:
 
@@ -219,7 +219,7 @@ Now try to do ajax request to the app at `http://localhost:8000/`
 
 * ###Error Response:
 
-  Code: 404 Not found 
+  Code: 400 Bad Request 
 
 * ###Sample Call:
 
@@ -314,7 +314,7 @@ Now try to do ajax request to the app at `http://localhost:8000/`
 
 * ###Error Response:
 
-  Code: 500 Internal error
+  Code: 500 Internal Server Error
 
 
 
