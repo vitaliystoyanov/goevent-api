@@ -19,13 +19,13 @@ class ApplicationError extends Error {
     constructor(settings, factoryContext) {
         super();
 
-        // Ensure that settings exists
+        // ensure that settings exists
         settings = (settings || {});
 
-        // Override the default name property
+        // override the default name property
         this.name = 'Error handler';
 
-        // Each of the following properties can be optionally passed-in as part of the settings argument
+        // each of the following properties can be optionally passed-in as part of the settings argument
         this.type = (settings.type || 'Default Error');
         this.code = (settings.code || '');
         this.message = (settings.message || 'An error occurred');
@@ -39,11 +39,8 @@ class ApplicationError extends Error {
     }
 }
 
-// Exports object module with factory arrow function and custom Error class
+// exports object module with factory arrow function and custom Error class
 module.exports = {
     createApplicationError,
     ApplicationError
 };
-
-
-

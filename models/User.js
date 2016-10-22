@@ -41,6 +41,44 @@ userSchema.methods.checkPassword = function(password) {
     return this.encryptPassword(password) === this.hashedPassword;
 };
 
+userSchema.statics.createUser = function(username, password) {
+    let User = this;
+    let query = {
+        username: username
+    };
+    let errorOptions = {};
+    let options = {};
+
+    return new Promise((resolve, reject) => {
+
+        User.findOne(query, (error, currentUser) => {
+            if (currentUser) {
+                errorOptions = {
+                    type: 'Client error',
+                    code: 404,
+                    message: 'The user was already exists',
+                    detail: 'The username that you try to use already exists'
+                };
+                reject(ApplicationError.createApplicationError(errorOptions));
+            } else {
+                options = {
+                    username: username,
+                    password: password
+                };
+                let user = new User(options);
+                user.save((error, currentUser) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        log.info('User saved successfully');
+                        resolve(currentUser);
+                    }
+                });
+            }
+        });
+    });
+};
+
 userSchema.statics.authorize = function(username, password) {
     let User = this;
     let query = {

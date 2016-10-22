@@ -26,18 +26,16 @@ const searchEvents = (next) => {
                 events = events.concat(response.data);
                 if (response.paging && response.paging.next) {
                     searchEvents(response.paging.next)
-                        .then(() => {
-                            resolve(beautifyResponse(events))
-                        });
+                        .then(() => resolve(beautifyResponse(events)));
                 } else {
                     resolve(events);
                 }
             })
             .catch(error => {
                 errorOptions = {
-                    type: 'Internal server error',
+                    type: 'Server Error',
                     code: 500,
-                    message: error.message,
+                    message: 'Internal server error',
                     detail: error.stack
                 };
                 log.error(ApplicationError(errorOptions));

@@ -7,6 +7,22 @@ const ApplicationError = require('helpers/applicationError');
 
 const userRouter = express.Router();
 
+userRouter.post('/signin', (req, res) => {
+    let username = req.body.username;
+    let password = req.body.password;
+    log.info(username);
+    log.info(password);
+    User.createUser(username, password)
+    .then(response => {
+        log.info(response);
+        res.json(response);
+    })
+    .catch(error => {
+        log.error("Error. ".concat(error));
+        res.json(error);
+    })
+});
+
 userRouter.post('/login', (req, res, next) => {
     log.info(req.body);
     passport.authenticate('local', (info, user, error) => {
@@ -51,13 +67,13 @@ userRouter.get('/events', (req, res) => {
         });
     } else {
         errorOptions = {
-            type: 'Application error',
-            code: 404,
+            type: 'Client error',
+            code: 401,
             message: 'Session not found',
             detail: 'You need to be login in system to get your own events'
         };
         let error = ApplicationError.createApplicationError(errorOptions);
-        error.status = 404;
+        // error.status = 401;
         res.json(error);
     }
 });
@@ -78,13 +94,13 @@ userRouter.post('/events', (req, res) => {
         });
     } else {
         errorOptions = {
-            type: 'Application error',
-            code: 404,
+            type: 'Client error',
+            code: 401,
             message: 'Session not found',
             detail: 'You need to be login in system to post your own events'
         };
         let error = ApplicationError.createApplicationError(errorOptions);
-        error.status = 404;
+        // error.status = 401;
         res.json(error);
     }
 });

@@ -35,9 +35,9 @@ const createEvent = data => {
             if (error) {
                 log.error(error);
                 errorOptions = {
-                    type: "Application save event error",
-                    code: error.status || 500,
-                    message: error.message || "",
+                    type: "Server Error",
+                    code: 500,
+                    message: "Internal Server Error",
                     detail: "An error occurred while trying to save a record",
                 };
                 throw(ApplicationError(errorOptions));
@@ -56,9 +56,9 @@ const deleteAllEvents = () => {
         if (error) {
             log.error(error);
             errorOptions = {
-                type: "Application delete all events error",
-                code: error.status || 500,
-                message: error.message || "",
+                type: "Server Error",
+                code: 500,
+                message: "Internal Server Error",
                 detail: "An error in an attempt to delete all records",
             };
             throw(ApplicationError(errorOptions));
@@ -74,12 +74,12 @@ const deleteAllEvents = () => {
 let updater = schedule.scheduleJob(DATE_SCHEDULE, () => {
     let searchResponse = {};
 
-    console.log('updater works...');
+    log.info('updater works...');
 
     searchEvents()
         .then(response => {
 
-            // Check that all the events were unique
+            // check that all the events were unique
             searchResponse.events = uniqueEvents(response);
             searchResponse.count = searchResponse.events.length;
 
@@ -87,19 +87,19 @@ let updater = schedule.scheduleJob(DATE_SCHEDULE, () => {
         })
         .then(searchResponse => {
 
-            // Clear database from old events
+            // clear database from old events
             deleteAllEvents();
 
             return searchResponse;
         })
         .then(searchResponse => {
 
-            // Saving new events in database
+            // saving new events in database
             createEvent(searchResponse.events);
         })
         .catch(error => {
             log.error(error);
-            res.json(error);
+            res.status(error.code).json(error);
         });
 });
 

@@ -25,9 +25,9 @@ let beautifyResponse = data => {
         });
     } catch (error) {
         errorOptions = {
-            type: 'Application error',
+            type: 'Server Error',
             code: 500,
-            message: 'Error in processing of data',
+            message: 'Internal Server Error',
             detail: 'Error in data structure: '.concat(error.message)
         };
         log.error(ApplicationError(errorOptions));

@@ -1,5 +1,4 @@
 global.api = {};
-// api.http = require('http');
 
 const db = require('./db');
 api.app = require('./app').api(db);
@@ -13,8 +12,9 @@ const onListening = error => log.info(`Server listening on port: ${config.get('p
 const onError = error => log.error(`Error server listening: ${error}`);
 
 // create http server and listen on provided port, on all network interfaces
-api.server = api.app.listen(config.get('port'), () => {
-    log.info(`Connecting on port : ${config.get('port')}`);
-}).on('listening', onListening).on('error', onError);
+api.server = api.app.listen(api.app.get('port'), () =>
+  log.info(`Connecting on port : ${api.app.get('port')}`))
+    .on('listening', onListening)
+    .on('error', onError);
 
 module.exports = api;

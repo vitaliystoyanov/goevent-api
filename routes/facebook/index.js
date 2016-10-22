@@ -12,16 +12,13 @@ const client = redis.createClient();
 
 let redisConnection = false;
 
-client
-    .on('ready', () => {
-        redisConnection = true;
-        log.info('Redis successfully connect');
-    })
-    .on('end', () => log.info('Redis connection closed'))
-    .on('error', error => {
-        redisConnection = false;
-        log.error(`Redis error. ${error}`);
-    });
+client.on('ready', () => {
+    redisConnection = true;
+    log.info('Redis successfully connect');
+}).on('end', () => log.info('Redis connection closed')).on('error', error => {
+    redisConnection = false;
+    log.error(`Redis error. ${error}`);
+});
 
 eventRouter.get('/events', (req, res) => {
     let pagination = {};
@@ -35,82 +32,117 @@ eventRouter.get('/events', (req, res) => {
     fields = (req.query.fields ? req.query.fields : null);
     fields = (fields === null ? {} : fields.replace(/,/g, ' '));
 
-    // if redis connected successfully
-    if (redisConnection) {
-        client.get('db_events', (error, value) => {
+    // get all events from database and cache data into redis
+    if (pagination.skip === null && pagination.limit === null) {
+        if (redisConnection) {
+            client.get('db_events', (error, value) => {
 
-            // if something gone wrong
-            if (error) {
-                errorOptions = {
-                    type: "Internal Server Error",
-                    code: 404,
-                    message: "Not Found",
-                    detail: "What you are looking for was not found. ".concat(error.message),
-                };
-                res.json(ApplicationError(errorOptions));
-                return log.error(ApplicationError(errorOptions));
-            }
+                // if something gone wrong
+                if (error) {
+                    errorOptions = {
+                        type: "Server Error",
+                        code: 502,
+                        message: "Bad Gateway",
+                        detail: "Problem with getting data. ".concat(error.message)
+                    };
+                    res.status(errorOptions.code).json(ApplicationError(errorOptions));
+                    return log.error(ApplicationError(errorOptions));
+                }
 
-            // check if cache is not cashed
-            if (!value) {
-                Event.find({}, fields, {}, (error, response) => {
+                // check if cache is not cashed
+                if (!value) {
+                    Event.find({}, fields, {}, (error, response) => {
 
-                    if (error) {
-                        errorOptions = {
-                            type: "Internal Server Error",
-                            code: 500,
-                            message: "Internal error",
-                            detail: "Problem with request to database. ".concat(error.message),
-                        };
-                        res.json(ApplicationError(errorOptions));
-                        return log.error(ApplicationError(errorOptions));
-                    }
+                        if (error) {
+                            errorOptions = {
+                                type: "Server Error",
+                                code: 500,
+                                message: "Internal Server Error",
+                                detail: "Problem with request to get events from database. ".concat(error.message)
+                            };
+                            res.status(errorOptions.code).json(ApplicationError(errorOptions));
+                            return log.error(ApplicationError(errorOptions));
+                        }
 
-                    Event.count({}, (error, count) => {
-                        data.events = response;
-                        data.count = count;
-                        log.info('Response from database query');
-                        res.json(data);
+                        Event.count({}, (error, count) => {
+                            data.events = response;
+                            data.count = count;
+                            log.info('Response from database query');
+                            res.json(data);
 
-                        // cache into redis
-                        client.set('db_events', JSON.stringify(data), error => {
+                            // cache into redis
+                            client.set('db_events', JSON.stringify(data), error => {
 
-                            if (error) {
-                                errorOptions = {
-                                    type: "Internal Server Error",
-                                    code: 500,
-                                    message: "Internal error",
-                                    detail: "Problem with caching data to memory. ".concat(error.message),
-                                };
-                                res.json(ApplicationError(errorOptions));
-                                return log.error(ApplicationError(errorOptions));
-                            }
+                                if (error) {
+                                    errorOptions = {
+                                        type: "Server Error",
+                                        code: 500,
+                                        message: "Internal Server Error",
+                                        detail: "Problem with caching data to memory. ".concat(error.message)
+                                    };
+                                    res.status(errorOptions.code).json(ApplicationError(errorOptions));
+                                    return log.error(ApplicationError(errorOptions));
+                                }
 
-                            // Expire query in 40 seconds
-                            client.expire('db_events', 40);
-                            log.info('Sucessfully cached data');
+                                // expire query in 40 seconds
+                                client.expire('db_events', 40);
+                                log.info('Sucessfully cached data');
+                            });
                         });
                     });
-                });
-            } else {
-                // get data from memory cache
-                log.info('Data from cache');
-                res.json(JSON.parse(value));
-            }
-        });
+                } else {
 
-        // if redis connected failure
+                    // get data from memory cache
+                    log.info('Data from cache');
+                    res.json(JSON.parse(value));
+                }
+            });
+        } else {
+            Event.find({}, {}, {}, (error, response) => {
+
+                if (error) {
+                    errorOptions = {
+                        type: "Server Error",
+                        code: 500,
+                        message: "Internal Server Error",
+                        detail: "Problem with request to get events from database. ".concat(error.message)
+                    };
+                    res.status(errorOptions.code).json(ApplicationError(errorOptions));
+                    return log.error(ApplicationError(errorOptions));
+                }
+
+                Event.count({}, (error, count) => {
+                    data.events = response;
+                    data.count = count;
+                    log.info('Response from database query, without caching');
+                    res.json(data);
+                });
+            });
+        }
+
+        // if the parameters have been transferred
+    } else if (isNaN(Number(pagination.skip)) || isNaN(Number(pagination.limit))) {
+        errorOptions = {
+            type: "Client error",
+            code: 400,
+            message: "Bad Request",
+            detail: "You must pass-in valid skip and limit parameters"
+        };
+        res.status(errorOptions.code).json(ApplicationError(errorOptions));
+        return log.error(ApplicationError(errorOptions));
     } else {
+        pagination.limit = Number(pagination.limit);
+        pagination.skip = Number(pagination.skip);
         Event.find(query, fields, pagination, (error, response) => {
 
             if (error) {
                 errorOptions = {
-                    type: "Internal Server Error",
+                    type: "Server Error",
                     code: 500,
-                    message: "Internal error",
-                    detail: "Problem with request to database, when pass parameters. ".concat(error.message),
+                    message: "Internal Server Error",
+                    detail: "Problem with request to get events from database, when pass parameters. ".concat(error.message)
                 };
-                res.json(ApplicationError(errorOptions));
+                res.status(errorOptions.code).json(ApplicationError(errorOptions));
                 return log.error(ApplicationError(errorOptions));
             }
 
@@ -132,31 +164,54 @@ eventRouter.get('/events/:id', (req, res) => {
     let data;
     let errorOptions = {};
 
-    // req.session.eventId = id;
+    if (isNaN(Number(id))) {
+        errorOptions = {
+            type: "Client error",
+            code: 400,
+            message: "Bad Request",
+            detail: "You must pass-in valid id parameter"
+        };
+        res.status(errorOptions.code).json(ApplicationError(errorOptions));
+        return log.error(ApplicationError(errorOptions));
+    }
 
     client.get('db_events', (error, value) => {
 
         if (error) {
-            return log.error(error);
+            errorOptions = {
+                type: "Server Error",
+                code: 502,
+                message: "Bad Gateway",
+                detail: "Problem with getting data. ".concat(error.message)
+            };
+            res.status(errorOptions.code).json(ApplicationError(errorOptions));
+            return log.error(ApplicationError(errorOptions));
         }
 
-        // Check if cache is not cashed
+        // check if cache is not cashed
         if (!value) {
             Event.findOne(query, (error, event) => {
 
                 if (error) {
-                    return log.error(error);
+                    errorOptions = {
+                        type: "Server Error",
+                        code: 500,
+                        message: "Internal Server Error",
+                        detail: "Problem with request to get events from database. ".concat(error.message)
+                    };
+                    res.status(errorOptions.code).json(ApplicationError(errorOptions));
+                    return log.error(ApplicationError(errorOptions));
                 }
 
                 if (event === null) {
                     errorOptions = {
-                        type: 'Client query error',
+                        type: 'Client Error',
                         code: 404,
-                        message: 'Event not found',
+                        message: 'Not Found',
                         detail: 'Event which you try to found is not exist by id: '.concat(id)
                     };
                     log.error(ApplicationError(errorOptions));
-                    res.status(404).json(ApplicationError(errorOptions));
+                    res.status(errorOptions.code).json(ApplicationError(errorOptions));
                 } else {
                     log.info('Event from database query');
                     res.json(event);
@@ -164,33 +219,32 @@ eventRouter.get('/events/:id', (req, res) => {
             });
         } else {
 
-            // Check your event by id in cache
+            // check your event by id in cache
             JSON.parse(value).events.forEach(item => {
                 if (id === item.eventId) {
                     data = item;
                 }
             });
 
-            // If event by id was found in cache
+            // if event by id was found in cache
             if (data) {
                 log.info('Event from cache');
                 res.json(data);
             } else {
                 errorOptions = {
-                    type: 'Client query error',
+                    type: 'Client Error',
                     code: 404,
-                    message: 'Event not found',
-                    detail: 'Event which you try to found is not exist by id'.concat(id)
+                    message: 'Not Found',
+                    detail: 'Event which you try to found is not exist by id: '.concat(id)
                 };
                 log.error(ApplicationError(errorOptions));
-                res.status(404).json(ApplicationError(errorOptions));
+                res.status(errorOptions.code).json(ApplicationError(errorOptions));
             }
         }
     });
 });
 
 eventRouter.get('/events-location', (req, res) => {
-    // const userAccessToken = config.get('fb:user_access_token');
     let locationResponse = {};
     let params = {};
 
@@ -199,17 +253,15 @@ eventRouter.get('/events-location', (req, res) => {
     params.distance = (req.query.distance ? req.query.distance : 2500);
 
     locationEvents(params)
-        .then(response => {
-            locationResponse.events = response;
-            locationResponse.count = locationResponse.events.length;
-            res.json(locationResponse);
-        })
-        .catch(error => {
-            log.error(error);
-            res.status(error.code).json(error);
-        });
+    .then(response => {
+        locationResponse.events = response;
+        locationResponse.count = locationResponse.events.length;
+        res.json(locationResponse);
+    })
+    .catch(error => {
+        log.error(error);
+        res.status(error.code).json(error);
+    });
 });
 
 module.exports = eventRouter;
-
-

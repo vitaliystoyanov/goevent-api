@@ -23,10 +23,10 @@ const uniqueEvents = duplicates => {
         return result;
     } else {
         errorOptions = {
-            type: "Function error arguments",
+            type: "Server Error",
             code: 500,
-            message: "Type of argument duplicates must be Array",
-            detail: "The argument duplicates is required but wasn't a valid type",
+            message: "Internal Server Error",
+            detail: "The argument duplicates is required but wasn't a valid type, must be Array.",
         };
         throw(ApplicationError(errorOptions));
     }

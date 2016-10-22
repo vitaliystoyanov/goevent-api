@@ -11,4 +11,3 @@ sessionStore.connection = db => {
 
     return new MongoStore(options);
 };
-

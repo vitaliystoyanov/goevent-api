@@ -41,6 +41,7 @@ app.api = db => {
     // app.use(express.static(path.join(__dirname.split('/').splice(0, 6).join('/'), '/frontend/build')));
 
     // view engine setup
+    app.set('port', config.get('port') || 3000);
     app.engine('jade', require('jade').renderFile);
     app.set('views', path.join(__dirname, '/views'));
     app.set('view engine', 'jade');
@@ -63,7 +64,7 @@ app.api = db => {
     // catch 404 and forward to error handler
     app.use((req, res, next) => {
         let errorOptions = {
-            type: 'Application error',
+            type: 'Client Error',
             code: 404,
             message: 'Page not found',
             detail: 'The page you were trying to open could not be found'
@@ -77,9 +78,13 @@ app.api = db => {
     if (app.get('env') === 'development') {
         app.use((error, req, res, next) => {
             res.status(error.status || 500);
-            res.render('error', {
-                error: error
-            });
+            res.json(error);
+
+            // should rest service generate pages?
+            // res.render('error', {
+            //     error: error
+            // });
+
         });
     }
 
