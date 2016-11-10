@@ -107,12 +107,17 @@ npm test
 
 * ###Error Response:
 
+<<<<<<< HEAD
   Code: 
   - 400 Bad Request - when user passed invalid parameters
   - 500 Internal Server Error - when server have problem with request to database with/without parameters
   - 500 Internal Server Error - when server have problem with caching data to memory
   - 502 Bad Gateway - when server have problem with getting data from redis
    
+=======
+  Code: 400 Bad Request   
+
+>>>>>>> 909f21278a241bd4b31960c4066057eee9662a2e
 * ###Sample Call:
 
   ```javascript
@@ -241,9 +246,13 @@ npm test
 
 * ###Error Response:
 
+<<<<<<< HEAD
   Code: 
   - 400 Bad Request - when user passed invalid parameters
   - 502 Bad Gateway - when server received invalid response from the upstream server
+=======
+  Code: 400 Bad Request 
+>>>>>>> 909f21278a241bd4b31960c4066057eee9662a2e
 
 * ###Sample Call:
 
@@ -423,6 +432,7 @@ npm test
   
 * ###Error Response:
 
+<<<<<<< HEAD
   Code: 
   - 401 Unauthorized - when server has'n found the session and the user isn't logged in
   - 404 Not Found - event was not found at the specified id
@@ -463,6 +473,9 @@ npm test
   Code: 200 
   
 * ###Error Response:
+=======
+  Code: 500 Internal Server Error
+>>>>>>> 909f21278a241bd4b31960c4066057eee9662a2e
 
   Code: 
   - 401 Unauthorized - when server has'n found the session and the user isn't logged in
