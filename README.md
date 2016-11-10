@@ -21,7 +21,7 @@ cd goevent-api
 npm install
 ```
 
-**You need also run a Redis server for caching data:**
+**You need also run a redis server for caching data:**
 
 ```
 cd [path-to-redis]
