@@ -284,6 +284,7 @@ npm test
 * ###Error Response:
 
   Code: 
+  - 400 Bad Request - when user entered invalid password
   - 404 Not Found - when user wasn't found by passed data
 
 * ###Sample Call:
