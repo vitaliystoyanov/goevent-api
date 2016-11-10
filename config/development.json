@@ -2,7 +2,6 @@
   "port": 8000,
   "mongoose": {
     "uri": "mongodb://melyourhero:qwerty@ds153745.mlab.com:53745/events-service",
-    "testdb": "mongodb://melyourhero:qwerty@ds063856.mlab.com:63856/test-event-service",
     "options": {
       "server": {
         "socketOptions": {
@@ -18,6 +17,6 @@
   "fb": {
     "version": "v2.7",
     "app_access_token": "1092868047486921|cd28be5fc50dbe8835fd2ed5c03bf666",
-    "user_access_token": "EAACEdEose0cBAI91eWMn0jfAedBBVYCQurJ7LiHfpFvAWedERIL2LyPboXC7OkSaOGu2jLr3HorofAFidNkctZAZAqvXs9sBA8C8nJ3V5KAcoqN6876lSzUkWK2PQYdEhq77b0ZBOk71D1mlRAlZC5gLH2jUhfQvZA1ErzWlw0QZDZD"
+    "user_access_token": "EAACEdEose0cBAKXwwM9uvzrQXbKKEuMDjoivZBo7ZAlrR9VEayOaxIXhDU3JZCHSt8ZBU3f3oBMaVyZCoZCQlaasLqHwQOutZAJ0QsXZBlKZA6h6P1RSYHARbVgarlDRVnUDVtC5vsKdTl8RUq3cx4iEGD3LuZAtVQ0ngFQIifKjbspQZDZD"
   }
 }

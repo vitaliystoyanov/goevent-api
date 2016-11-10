@@ -1,7 +1,8 @@
 const express = require('express');
 const passport = require('middlewares/auth');
 const log = require('libs/log').getLogger(module);
-const Event = require('models/Event');
+const Event = require('models/Event').Event;
+const UserEvent = require('models/Event').UserEvent;
 const User = require('models/User');
 const ApplicationError = require('helpers/applicationError');
 
@@ -10,21 +11,20 @@ const userRouter = express.Router();
 userRouter.post('/signin', (req, res) => {
     let username = req.body.username;
     let password = req.body.password;
-    log.info(username);
-    log.info(password);
+
     User.createUser(username, password)
-    .then(response => {
-        log.info(response);
-        res.json(response);
-    })
-    .catch(error => {
-        log.error("Error. ".concat(error));
-        res.json(error);
-    })
+        .then(response => {
+            // log.info(response);
+            res.json(response);
+        })
+        .catch(error => {
+            log.error("Error. ".concat(error));
+            res.status(error.code).json(error);
+        })
 });
 
 userRouter.post('/login', (req, res, next) => {
-    log.info(req.body);
+    // log.info(req.body);
     passport.authenticate('local', (info, user, error) => {
         if (error) {
             return res.json(error);
@@ -41,15 +41,14 @@ userRouter.post('/login', (req, res, next) => {
 userRouter.post('/logout', (req, res) => {
     // req.session.destroy();
     req.logout();
-    log.info('Session destroyed');
-    res.send({logout: 'Success'});
+    let status = Boolean(!req.user);
+    log.info('User session destroyed successfully');
+    res.send({logout: status});
 });
 
 userRouter.get('/events', (req, res) => {
     let query = {};
     let errorOptions = {};
-
-    log.info(req.user);
 
     // check if user session available
     if (req.user) {
@@ -57,10 +56,11 @@ userRouter.get('/events', (req, res) => {
             eventCreator: req.user.id
         };
 
-        Event.find(query, (error, events) => {
+        UserEvent.find(query, (error, events) => {
+
             if (error) {
                 log.error(error);
-                res.json(error);
+                res.status(404).json(error);
             } else {
                 res.json(events);
             }
@@ -69,39 +69,113 @@ userRouter.get('/events', (req, res) => {
         errorOptions = {
             type: 'Client error',
             code: 401,
-            message: 'Session not found',
+            message: 'Unauthorized',
             detail: 'You need to be login in system to get your own events'
         };
         let error = ApplicationError.createApplicationError(errorOptions);
-        // error.status = 401;
-        res.json(error);
+        res.status(error.code).json(error);
     }
 });
 
-userRouter.post('/events', (req, res) => {
-    let myNewEvent;
+userRouter.post('/events/:id', (req, res) => {
+    let userEvent;
     let errorOptions = {};
 
+    let query = {
+        eventId: req.params.id
+    };
+
     if (req.user) {
-        myNewEvent = new Event({eventCreator: req.user.id, eventDescription: 'TESTFROM THIS USER2'});
-        myNewEvent.save((error) => {
+        Event.find(query, (error, event) => {
+
             if (error) {
-                log.error(error);
-                res.json({error: error.message});
+
+                return res.status(404).json({error: error});
+            }
+
+            // casting the array
+            event = event[0];
+
+            // creating new record
+            userEvent = new UserEvent({
+                eventCreator: req.user.id,
+                eventPicture: event.eventPicture,
+                eventId: event.eventId,
+                eventName: event.eventName,
+                eventDescription: event.eventDescription,
+                eventCategory: event.eventCategory,
+                eventStartTime: event.eventStartTime,
+                eventEndTime: event.eventEndTime,
+                eventLocation: event.eventLocation
+            });
+
+            // saving new record
+            userEvent.save(error => {
+                if (error) {
+                    log.error(error);
+
+                    return res.status(500).json({error: error.message});
+                } else {
+
+                    return res.json({
+                        status: true,
+                        message: 'Successfully saved new event'
+                    });
+                }
+            });
+        });
+
+    } else {
+        errorOptions = {
+            type: 'Client error',
+            code: 401,
+            message: 'Unauthorized',
+            detail: 'You need to be login in system to post your own events'
+        };
+        let error = ApplicationError.createApplicationError(errorOptions);
+        res.status(error.code).json(error);
+    }
+});
+
+userRouter.delete('/events/:id', (req, res) => {
+    let query = {};
+    let errorOptions = {};
+
+    query.eventId = req.params.id;
+
+    if (req.user) {
+        UserEvent.find(query, (error, event) => {
+
+            if (event[0].eventCreator == req.user.id) {
+                UserEvent.remove(query, (error, success) => {
+
+                    if (error) {
+
+                        return res.status(500).json(error);
+                    }
+
+                    res.json({message: 'Successfully deleted event'});
+                });
             } else {
-                res.json({status: 'Success saved new event'});
+                errorOptions = {
+                    type: 'Client error',
+                    code: 404,
+                    message: 'Event not found',
+                    detail: 'You need to pass an existing id of your events'
+                };
+                let error = ApplicationError.createApplicationError(errorOptions);
+                res.status(404).json(error);
             }
         });
     } else {
         errorOptions = {
             type: 'Client error',
             code: 401,
-            message: 'Session not found',
+            message: 'Unauthorized',
             detail: 'You need to be login in system to post your own events'
         };
         let error = ApplicationError.createApplicationError(errorOptions);
-        // error.status = 401;
-        res.json(error);
+        res.status(error.code).json(error);
     }
 });
 

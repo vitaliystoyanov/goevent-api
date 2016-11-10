@@ -1,15 +1,15 @@
 const schedule = require('node-schedule');
-const searchEvents = require('routes/facebook/search');
-const Event = require('models/Event');
+const searchEvents = require('libs/facebook/search');
+const Event = require('models/Event').Event;
 const ApplicationError = require('helpers/applicationError').createApplicationError;
 const log = require('libs/log').getLogger(module);
 const uniqueEvents = require('helpers/uniqueEvents').uniqueEvents;
 
 // date of permanent updating of the database
 const DATE_SCHEDULE = {
-    hour: 20,
-    minute: 39,
-    dayOfWeek: 6
+    hour: 14,
+    minute: 45,
+    dayOfWeek: 2
 };
 
 /**
@@ -26,6 +26,7 @@ const createEvent = data => {
             eventId: item.eventId,
             eventName: item.eventName,
             eventDescription: item.eventDescription,
+            eventCategory: item.eventCategory,
             eventStartTime: item.eventStartTime,
             eventEndTime: item.eventEndTime,
             eventLocation: item.eventLocation
@@ -99,7 +100,8 @@ let updater = schedule.scheduleJob(DATE_SCHEDULE, () => {
         })
         .catch(error => {
             log.error(error);
-            res.status(error.code).json(error);
+
+            // res.status(error.code).json(error);
         });
 });
 

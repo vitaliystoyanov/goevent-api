@@ -1,0 +1,22 @@
+{
+  "port": 8000,
+  "mongoose": {
+    "uri": "mongodb://melyourhero:qwerty@ds063856.mlab.com:63856/test-event-service",
+    "options": {
+      "server": {
+        "socketOptions": {
+          "keepAlive": 1
+        }
+      }
+    }
+  },
+  "session": {
+    "secret": "MelIsYourHero",
+    "key": "AgentKey"
+  },
+  "fb": {
+    "version": "v2.7",
+    "app_access_token": "1092868047486921|cd28be5fc50dbe8835fd2ed5c03bf666",
+    "user_access_token": "EAACEdEose0cBAKXwwM9uvzrQXbKKEuMDjoivZBo7ZAlrR9VEayOaxIXhDU3JZCHSt8ZBU3f3oBMaVyZCoZCQlaasLqHwQOutZAJ0QsXZBlKZA6h6P1RSYHARbVgarlDRVnUDVtC5vsKdTl8RUq3cx4iEGD3LuZAtVQ0ngFQIifKjbspQZDZD"
+  }
+}

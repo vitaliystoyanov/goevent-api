@@ -6,7 +6,7 @@ const beautifyResponse = require('helpers/beautifyResponse').beautifyResponse;
 const ApplicationError = require('helpers/applicationError').createApplicationError;
 
 let prefix = 'https://graph.facebook.com/';
-let fields = 'id, name, description, place.fields(id, name, location.fields(name, street, city, country,' +
+let fields = 'id, name, description, owner.fields(name, category), place.fields(id, name, location.fields(name, street, city, country,' +
     'latitude, longitude)), cover.fields(id, source), start_time, end_time';
 let events = [];
 let errorOptions = {};
@@ -17,8 +17,8 @@ let errorOptions = {};
  * @return {Promise} Promise function with result or error from response
  */
 const searchEvents = (next) => {
-    const uri = (next ? next : prefix.concat(config.get('fb:version')) + '/search?q=Kyiv&type=event&limit=1000&fields=' +
-    fields.concat('&since=' + currentDate) + '&access_token=' + config.get('fb:user_access_token'));
+    const uri = (next ? next : prefix.concat(config.fb.version) + '/search?q=Kyiv&type=event&limit=1000&fields=' +
+    fields.concat('&since=' + currentDate) + '&access_token=' + config.fb.user_access_token);
 
     return new Promise((resolve, reject) => {
         requestPromise(uri)

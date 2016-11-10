@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const config = require('config');
 const log = require('libs/log').getLogger(module);
 
-mongoose.connect(config.get('mongoose:uri'), config.get('mongoose:options'));
+mongoose.connect(config.mongoose.uri, config.mongoose.options);
 
 // event listener for Database "successful connection" event and "error" event
 mongoose.connection

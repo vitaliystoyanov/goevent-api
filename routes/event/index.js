@@ -1,10 +1,10 @@
 const express = require('express');
 const redis = require('redis');
 const log = require('libs/log').getLogger(module);
-const Event = require('models/Event');
+const Event = require('models/Event').Event;
 const User = require('models/User');
 const config = require('config');
-const locationEvents = require('./location').locationEvents;
+const locationEvents = require('libs/facebook/location/index').locationEvents;
 const ApplicationError = require('helpers/applicationError').createApplicationError;
 
 const eventRouter = express.Router();
@@ -84,16 +84,35 @@ eventRouter.get('/events', (req, res) => {
                                     return log.error(ApplicationError(errorOptions));
                                 }
 
-                                // expire query in 40 seconds
-                                client.expire('db_events', 40);
+                                // expire query in 10 seconds
+                                client.expire('db_events', 10);
                                 log.info('Sucessfully cached data');
                             });
                         });
                     });
                 } else {
 
-                    // get data from memory cache
+                    // get data from memory cache and after 10 seconds clear its
                     log.info('Data from cache');
+                    client.expire('db_events', 10);
+
+                    // setTimeout(() => {
+                    //     client.flushdb((error, succes) => {
+                    //         if (succes) {
+                    //             log.info('Successfuly cleaned');
+                    //         } else {
+                    //             errorOptions = {
+                    //                 type: "Server Error",
+                    //                 code: 500,
+                    //                 message: "Internal Server Error",
+                    //                 detail: "Problem with request to clear cache. ".concat(error.message)
+                    //             };
+                    //             res.status(errorOptions.code).json(ApplicationError(errorOptions));
+                    //             return log.error(ApplicationError(errorOptions));
+                    //         }
+                    //     });
+                    // }, 10000);
+
                     res.json(JSON.parse(value));
                 }
             });
@@ -253,15 +272,16 @@ eventRouter.get('/events-location', (req, res) => {
     params.distance = (req.query.distance ? req.query.distance : 2500);
 
     locationEvents(params)
-    .then(response => {
-        locationResponse.events = response;
-        locationResponse.count = locationResponse.events.length;
-        res.json(locationResponse);
-    })
-    .catch(error => {
-        log.error(error);
-        res.status(error.code).json(error);
-    });
+        .then(response => {
+            locationResponse.events = response;
+            locationResponse.count = locationResponse.events.length;
+            res.json(locationResponse);
+        })
+        .catch(error => {
+            log.error(error);
+            log.info(error.code);
+            res.status(error.code).json(error);
+        });
 });
 
 module.exports = eventRouter;

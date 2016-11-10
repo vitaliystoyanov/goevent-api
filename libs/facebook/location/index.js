@@ -25,13 +25,11 @@ let locationEvents = (geolocation, userToken) => {
 
         // if geolocation parameters is not valid
         if (checkGeoParams(geolocation)) {
-            const accessToken = (userToken
-                ? userToken
-                : config.get('fb:app_access_token'));
+            const accessToken = (userToken ? userToken : config.fb.app_access_token);
             let prefix = 'https://graph.facebook.com/';
-            let uri = prefix + config.get('fb:version') + '/search?type=place&q=&center=' + geolocation.latitude + ',' + geolocation.longitude + '&distance=' + geolocation.distance + '&limit=1000&fields=id&access_token=' + accessToken;
+            let uri = prefix + config.fb.version + '/search?type=place&q=&center=' + geolocation.latitude + ',' + geolocation.longitude + '&distance=' + geolocation.distance + '&limit=1000&fields=id&access_token=' + accessToken;
             let fields = 'events.fields(id, name, place.fields(id, name, location.fields(name, street, city, country,' +
-            'latitude, longitude)), cover.fields(id, source), description, start_time, end_time)';
+                'latitude, longitude)), cover.fields(id, source), description, owner.fields(name, category), start_time, end_time)';
             let idLimit = 50;
             let ids = [];
             let container = [];
@@ -61,7 +59,7 @@ let locationEvents = (geolocation, userToken) => {
 
                 // create a Graph API request (promisified)
                 ids.forEach((id, index, array) => {
-                    let url = prefix.concat(config.get('fb:version')) + '/?ids=' + id.join(',') + '&fields=' + fields + '.since(' + currentDate + ')&access_token=' + accessToken;
+                    let url = prefix.concat(config.fb.version) + '/?ids=' + id.join(',') + '&fields=' + fields + '.since(' + currentDate + ')&access_token=' + accessToken;
                     urls.push(requestPromise(url));
                 });
 

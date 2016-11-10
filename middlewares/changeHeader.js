@@ -2,6 +2,6 @@ const headerOverride = {};
 module.exports = headerOverride;
 
 headerOverride.getChangeHeader = (req, res, next) => {
-    res.set('X-Powered-By', 'Event service');
+    res.set('X-Powered-By', 'geEvent service');
     next();
 };

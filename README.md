@@ -2,7 +2,7 @@
 
 This is a REST API for event notifications. This app created to help people quickly find interesting activities depending on the location (person or selected manually). With this service you are always updated with the latest events for every taste.
 
-## Getting Started
+## Getting started
 
 To get you started you can simply clone this repository and install the dependencies:
 
@@ -13,7 +13,7 @@ git clone https://github.com/melyourhero/goevent-api
 cd goevent-api
 ```
 
-### Install Dependencies
+### Install dependencies
 
 **The entire project**
 
@@ -28,9 +28,9 @@ cd [path-to-redis]
 src/redis-server
 ```
 
-[For more information how to install and configure](http://redis.io/topics/quickstart)
+[For more information how to install and configure Redis](http://redis.io/topics/quickstart)
 
-### Run the Application
+### Run the application
 
 **In the root folder type:**
 
@@ -42,16 +42,25 @@ Note: if you are using windows, you should run the server with the following com
 
 ```
 set NODE_PATH=.
+set NODE_ENV=development
 nodemon server
 ```
 
-Now try to do ajax request to the app at `http://localhost:8000/`
+Now try to do ajax request to the app at `http://localhost:8000/v1.0/`
 
-#API Specs:
+Note: if you want start test, you should change NODE_ENV:
+
+```
+set NODE_PATH=.
+set NODE_ENV=test
+npm test
+```
+
+#API specification:
 
 * ##URL
  
-  /v1.0/events
+  events
 
 * ###Method:
   
@@ -84,6 +93,7 @@ Now try to do ajax request to the app at `http://localhost:8000/`
       eventPicture: "Event picture URL",
       eventStartTime: "20XX-XX-XXTXX:XX:XX+XXXX",
       eventEndTime: "20XX-XX-XXTXX:XX:XX+XXXX",
+      eventCategory: "Music",
       eventLocation: {
         location: {
           city: "Event city",
@@ -97,13 +107,17 @@ Now try to do ajax request to the app at `http://localhost:8000/`
 
 * ###Error Response:
 
-  Code: 404 Not found  
-
+  Code: 
+  - 400 Bad Request - when user passed invalid parameters
+  - 500 Internal Server Error - when server have problem with request to database with/without parameters
+  - 500 Internal Server Error - when server have problem with caching data to memory
+  - 502 Bad Gateway - when server have problem with getting data from redis
+   
 * ###Sample Call:
 
   ```javascript
   $.ajax({
-    url: "/v1.0/events",
+    url: "http://localhost:8000/v1.0/events",
     type : "GET",
     success : function(events) {
       console.log(events);
@@ -113,13 +127,13 @@ Now try to do ajax request to the app at `http://localhost:8000/`
   
 * ##URL
  
-  /v1.0/events/:id
+  events/:id
 
 * ###Method:
   
   `GET`
   
-* ###URL Params
+* ###Identificator 
 
   Required:
 
@@ -142,6 +156,7 @@ Now try to do ajax request to the app at `http://localhost:8000/`
       eventPicture: "Event picture URL",
       eventStartTime: "20XX-XX-XXTXX:XX:XX+XXXX",
       eventEndTime: "20XX-XX-XXTXX:XX:XX+XXXX",
+      eventCategory: "Music",
       eventLocation: {
         location: {
           city: "Event city",
@@ -155,13 +170,17 @@ Now try to do ajax request to the app at `http://localhost:8000/`
 
 * ###Error Response:
 
-  Code: 404 Not found 
-
+  Code: 
+  - 400 Bad Request - when user passed invalid parameters
+  - 404 Not Found - when client tries to get non existing event
+  - 500 Internal Server Error - when server have problem with request to database
+  - 502 Bad Gateway - when server have problem with getting data from redis
+  
 * ###Sample Call:
 
   ```javascript
   $.ajax({
-    url: "/v1.0/events/2143546423430321",
+    url: "http://localhost:8000/v1.0/events/2143546423430321",
     type : "GET",
     success : function(singleEvent) {
       console.log(singleEvent);
@@ -171,7 +190,7 @@ Now try to do ajax request to the app at `http://localhost:8000/`
   
 * ##URL
  
-  /v1.0/events-location
+  events-location
 
 * ###Method:
   
@@ -188,6 +207,8 @@ Now try to do ajax request to the app at `http://localhost:8000/`
   Non-required:
   
   `distance=[integer]`
+  
+  Note: by default 2500 meters 
 
 * ###Data Params
 
@@ -206,6 +227,7 @@ Now try to do ajax request to the app at `http://localhost:8000/`
       eventPicture: "Event picture URL",
       eventStartTime: "20XX-XX-XXTXX:XX:XX+XXXX",
       eventEndTime: "20XX-XX-XXTXX:XX:XX+XXXX",
+      eventCategory: "Music",
       eventLocation: {
         location: {
           city: "Event city",
@@ -219,13 +241,15 @@ Now try to do ajax request to the app at `http://localhost:8000/`
 
 * ###Error Response:
 
-  Code: 404 Not found 
+  Code: 
+  - 400 Bad Request - when user passed invalid parameters
+  - 502 Bad Gateway - when server received invalid response from the upstream server
 
 * ###Sample Call:
 
   ```javascript
   $.ajax({
-    url: "/v1.0/events-location?lat=50.43&lng=30.52&distance=4000",
+    url: "http://localhost:8000/v1.0/events-location?lat=50.43&lng=30.52&distance=4000",
     type : "GET",
     success : function(locationEvents) {
       console.log(locationEvents);
@@ -235,7 +259,89 @@ Now try to do ajax request to the app at `http://localhost:8000/`
   
 * ##URL
  
-  /v1.0/user/user-events
+  user/login
+
+* ###Method:
+  
+  `POST`
+  
+* ###URL Params
+
+  None
+
+* ###Data Params
+
+  Required:
+
+ `username=[string]`
+ 
+ `password=[string]`
+
+* ###Success Response:
+
+  Code: 200   
+
+* ###Error Response:
+
+  Code: 
+  - 404 Not Found - when user wasn't found by passed data
+
+* ###Sample Call:
+
+  ```javascript
+  $.ajax({
+    url: "http://localhost:8000/v1.0/user/login",
+    type : "POST",
+    body: {
+        username: "Leonhard Euler",
+        password: "lovemathematics123"
+    },
+    success : function(session) {
+      console.log(session);
+    }
+  });
+  ```  
+
+* ##URL
+ 
+  user/logout
+
+* ###Method:
+  
+  `POST`
+  
+* ###URL Params
+
+  None
+
+* ###Data Params
+
+  None
+
+* ###Success Response:
+
+  Code: 200   
+
+* ###Error Response:
+
+  Code: 
+  - 404 Not Found - when session expired and deleted from database
+
+* ###Sample Call:
+
+  ```javascript
+  $.ajax({
+    url: "http://localhost:8000/v1.0/user/logout",
+    type : "POST",
+    success : function(destroyed) {
+      console.log(destroyed);
+    }
+  });
+  ``` 
+     
+* ##URL
+ 
+  user/events
 
 * ###Method:
   
@@ -263,6 +369,7 @@ Now try to do ajax request to the app at `http://localhost:8000/`
       eventPicture: "Event picture URL",
       eventStartTime: "20XX-XX-XXTXX:XX:XX+XXXX",
       eventEndTime: "20XX-XX-XXTXX:XX:XX+XXXX",
+      eventCategory: "Music",
       eventLocation: {
         location: {
           city: "Event city",
@@ -276,13 +383,15 @@ Now try to do ajax request to the app at `http://localhost:8000/`
 
 * ###Error Response:
 
-  Code: 404 Not found 
+  Code:
+  - 401 Unauthorized - when server has'n found the session and the user isn't logged in
+  - 404 Not found - when server didn't find any events for unique user  
 
 * ###Sample Call:
 
   ```javascript
   $.ajax({
-    url: "/v1.0/user/user-events",
+    url: "http://localhost:8000/v1.0/user/events",
     type : "GET",
     success : function(userEvents) {
       console.log(userEvents);
@@ -292,30 +401,85 @@ Now try to do ajax request to the app at `http://localhost:8000/`
   
 * ##URL
  
-  /v1.0/user/new-event
+  user/events/:id
 
 * ###Method:
   
   `POST`
   
-* ###URL Params
+* ###Identificator
 
-  None
+  Required:
 
+  `id=[integer]`
+ 
 * ###Data Params
   
-  event=[Object]
+  None
   
-
 * ###Success Response:
 
   Code: 200 
   
-
 * ###Error Response:
 
-  Code: 500 Internal error
+  Code: 
+  - 401 Unauthorized - when server has'n found the session and the user isn't logged in
+  - 404 Not Found - event was not found at the specified id
+  - 500 Internal Server Error - when server have error with saving event to database
+  
+* ###Sample Call:
+ 
+    ```javascript
+    $.ajax({
+      url: "http://localhost:8000/v1.0/user/events/111111111111",
+      type : "POST",
+      success : function(response) {
+        console.log(response);
+      }
+    });
+    ```
 
+* ##URL
+ 
+  user/events/:id
+
+* ###Method:
+  
+  `DELETE`
+  
+* ###Identificator
+
+  Required:
+
+  `id=[integer]`
+ 
+* ###Data Params
+  
+  None
+  
+* ###Success Response:
+
+  Code: 200 
+  
+* ###Error Response:
+
+  Code: 
+  - 401 Unauthorized - when server has'n found the session and the user isn't logged in
+  - 404 Not Found - event was not found at the specified id
+  - 500 Internal Server Error - when server have error with saving event to database
+  
+* ###Sample Call:
+ 
+    ```javascript
+    $.ajax({
+      url: "http://localhost:8000/v1.0/user/events/111111111111",
+      type : "DELETE",
+      success : function(response) {
+        console.log(response);
+      }
+    });
+    ```
 
 
 

@@ -10,6 +10,7 @@ let eventSchema = new Schema({
     eventId: String,
     eventName: String,
     eventDescription: String,
+    eventCategory: String,
     eventPicture: String,
     eventStartTime: String,
     eventEndTime: String,
@@ -27,7 +28,11 @@ let eventSchema = new Schema({
 });
 
 let Event = mongoose.model('Event', eventSchema);
+let UserEvent = mongoose.model('UserEvent', eventSchema);
 
-module.exports = Event;
+module.exports = {
+    Event,
+    UserEvent
+};
 
 

@@ -3,7 +3,11 @@ const LocalStrategy = require('passport-local').Strategy;
 const User = require('models/User');
 const log = require('libs/log').getLogger(module);
 
-passport.use(new LocalStrategy((username, password, done) => {
+passport.use(new LocalStrategy({
+        usernameField: 'username',
+        passwordField: 'password',
+    },
+    (username, password, done) => {
         User.authorize(username, password)
             .then(user => done(null, {id: user._id}))
             .catch(error => {

@@ -11,6 +11,10 @@ let beautifyResponse = data => {
     let errorOptions = {};
     let temp;
 
+    let checkCategory = event => {
+        return (event.owner ? event.owner.category ? event.owner.category : null : null);
+    };
+
     try {
         data.forEach(item => {
             temp = {};
@@ -18,6 +22,7 @@ let beautifyResponse = data => {
             temp.eventId = (item.id ? item.id : null);
             temp.eventName = (item.name ? item.name : null);
             temp.eventDescription = (item.description ? item.description : null);
+            temp.eventCategory = checkCategory(item);
             temp.eventStartTime = (item.start_time ? item.start_time : null);
             temp.eventEndTime = (item.end_time ? item.end_time : null);
             temp.eventLocation = (item.place ? item.place : null);
@@ -31,6 +36,7 @@ let beautifyResponse = data => {
             detail: 'Error in data structure: '.concat(error.message)
         };
         log.error(ApplicationError(errorOptions));
+        log.error(error.message);
         throw ApplicationError(errorOptions);
     }
 
