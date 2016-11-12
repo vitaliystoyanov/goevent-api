@@ -1,6 +1,6 @@
 # Search events service
 
-This is a REST API for event notifications. This app created to help people quickly find interesting activities depending on the location (person or selected manually). With this service you are always updated with the latest events for every taste.
+This is a REST API for event notifications. This app created to help people quickly find interesting activities depending on the location (person location or selected manually). With this service you are always updated with the latest events for every taste.
 
 ## Getting started
 
@@ -21,7 +21,7 @@ cd goevent-api
 npm install
 ```
 
-**You need also run a Redis server for caching data:**
+**You need also run a redis server for caching data:**
 
 ```
 cd [path-to-redis]
@@ -107,17 +107,12 @@ npm test
 
 * ###Error Response:
 
-<<<<<<< HEAD
   Code: 
   - 400 Bad Request - when user passed invalid parameters
   - 500 Internal Server Error - when server have problem with request to database with/without parameters
   - 500 Internal Server Error - when server have problem with caching data to memory
-  - 502 Bad Gateway - when server have problem with getting data from redis
-   
-=======
-  Code: 400 Bad Request   
+  - 502 Bad Gateway - when server have problem with getting data from redis 
 
->>>>>>> 909f21278a241bd4b31960c4066057eee9662a2e
 * ###Sample Call:
 
   ```javascript
@@ -246,13 +241,9 @@ npm test
 
 * ###Error Response:
 
-<<<<<<< HEAD
   Code: 
   - 400 Bad Request - when user passed invalid parameters
   - 502 Bad Gateway - when server received invalid response from the upstream server
-=======
-  Code: 400 Bad Request 
->>>>>>> 909f21278a241bd4b31960c4066057eee9662a2e
 
 * ###Sample Call:
 
@@ -293,6 +284,7 @@ npm test
 * ###Error Response:
 
   Code: 
+  - 400 Bad Request - when user entered invalid password
   - 404 Not Found - when user wasn't found by passed data
 
 * ###Sample Call:
@@ -432,7 +424,6 @@ npm test
   
 * ###Error Response:
 
-<<<<<<< HEAD
   Code: 
   - 401 Unauthorized - when server has'n found the session and the user isn't logged in
   - 404 Not Found - event was not found at the specified id
@@ -473,9 +464,6 @@ npm test
   Code: 200 
   
 * ###Error Response:
-=======
-  Code: 500 Internal Server Error
->>>>>>> 909f21278a241bd4b31960c4066057eee9662a2e
 
   Code: 
   - 401 Unauthorized - when server has'n found the session and the user isn't logged in
@@ -493,7 +481,3 @@ npm test
       }
     });
     ```
-
-
-
-
