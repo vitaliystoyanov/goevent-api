@@ -97,8 +97,8 @@ userSchema.statics.authorize = function(username, password) {
                 } else {
                     errorOptions = {
                         type: 'Authorization error',
-                        code: 404,
-                        message: 'The user was not valid',
+                        code: 400,
+                        message: 'Bad Request',
                         detail: 'The user has entered invalid password'
                     };
                     reject(ApplicationError.createApplicationError(errorOptions));
@@ -107,7 +107,7 @@ userSchema.statics.authorize = function(username, password) {
                 errorOptions = {
                     type: 'Authorization error',
                     code: 404,
-                    message: 'The user was not valid',
+                    message: 'Not Found',
                     detail: 'User not found'
                 };
                 reject(ApplicationError.createApplicationError(errorOptions));

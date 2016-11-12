@@ -8,8 +8,8 @@ const uniqueEvents = require('helpers/uniqueEvents').uniqueEvents;
 // date of permanent updating of the database
 const DATE_SCHEDULE = {
     hour: 14,
-    minute: 45,
-    dayOfWeek: 2
+    minute: 43,
+    dayOfWeek: 6
 };
 
 /**

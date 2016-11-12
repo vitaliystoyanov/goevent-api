@@ -18,18 +18,20 @@ let checkGeoParams = settings => (isNaN(Number(settings.latitude)) ? false : isN
  * @param {string} userToken String of user access token if login through Facebook
  * @return {Promise} Promise function with result or error from response
  */
-let locationEvents = (geolocation, userToken) => {
+let locationEvents = (geolocation, options) => {
 
     return new Promise((resolve, reject) => {
         let errorOptions = {};
 
         // if geolocation parameters is not valid
         if (checkGeoParams(geolocation)) {
-            const accessToken = (userToken ? userToken : config.fb.app_access_token);
+            const accessToken = ((options && options.userToken) ? options.userToken : config.fb.app_access_token);
             let prefix = 'https://graph.facebook.com/';
             let uri = prefix + config.fb.version + '/search?type=place&q=&center=' + geolocation.latitude + ',' + geolocation.longitude + '&distance=' + geolocation.distance + '&limit=1000&fields=id&access_token=' + accessToken;
             let fields = 'events.fields(id, name, place.fields(id, name, location.fields(name, street, city, country,' +
                 'latitude, longitude)), cover.fields(id, source), description, owner.fields(name, category), start_time, end_time)';
+            let since;
+            let until;
             let idLimit = 50;
             let ids = [];
             let container = [];
@@ -57,9 +59,17 @@ let locationEvents = (geolocation, userToken) => {
                 return ids;
             }).then(ids => {
 
+                if(options && options.since && options.until) {
+                    since = '.since(' + options.since + ')';
+                    until = '.until(' + options.until + ')';
+                } else {
+                    since = '.since(' + currentDate + ')';
+                    until = '';
+                }
+
                 // create a Graph API request (promisified)
                 ids.forEach((id, index, array) => {
-                    let url = prefix.concat(config.fb.version) + '/?ids=' + id.join(',') + '&fields=' + fields + '.since(' + currentDate + ')&access_token=' + accessToken;
+                    let url = prefix.concat(config.fb.version) + '/?ids=' + id.join(',') + '&fields=' + fields + since + until + '&access_token=' + accessToken;
                     urls.push(requestPromise(url));
                 });
 

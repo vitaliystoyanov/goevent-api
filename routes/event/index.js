@@ -266,12 +266,16 @@ eventRouter.get('/events/:id', (req, res) => {
 eventRouter.get('/events-location', (req, res) => {
     let locationResponse = {};
     let params = {};
+    let options = {};
 
     params.latitude = req.query.lat;
     params.longitude = req.query.lng;
     params.distance = (req.query.distance ? req.query.distance : 2500);
 
-    locationEvents(params)
+    options.since = req.query.since;
+    options.until = req.query.until;
+
+    locationEvents(params, options)
         .then(response => {
             locationResponse.events = response;
             locationResponse.count = locationResponse.events.length;
