@@ -208,7 +208,13 @@ npm test
   
   `distance=[integer]`
   
-  Note: by default 2500 meters 
+   Note: by default 2500 meters 
+  
+  `since=[Date]`
+  
+  `until=[Date]`
+  
+  Note: date entered in the following format - YYYY-MM-DD
 
 * ###Data Params
 
@@ -249,7 +255,7 @@ npm test
 
   ```javascript
   $.ajax({
-    url: "http://localhost:8000/v1.0/events-location?lat=50.43&lng=30.52&distance=4000",
+    url: "http://localhost:8000/v1.0/events-location?lat=50.43&lng=30.52&distance=4000since=XXXX-XX-XX&until=XXXX-XX-XX",
     type : "GET",
     success : function(locationEvents) {
       console.log(locationEvents);
