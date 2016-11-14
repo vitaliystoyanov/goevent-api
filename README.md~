@@ -200,9 +200,9 @@ npm test
 
   Required:
 
-  `lat=[integer]`
+  `latitude=[integer]`
   
-  `lng=[integer]`
+  `longitude=[integer]`
   
   Non-required:
   
