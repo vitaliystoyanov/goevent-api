@@ -2,6 +2,10 @@
 
 This is a REST API for event notifications. This app created to help people quickly find interesting activities depending on the location (person location or selected manually). With this service you are always updated with the latest events for every taste.
 
+## Versions API
+
+Before executing HTTP requests you should specify version of the API. Current version of the API 1.
+
 ## Getting started
 
 To get you started you can simply clone this repository and install the dependencies:
