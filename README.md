@@ -1,6 +1,6 @@
 # Search events service
 
-This is a REST API for event notifications. This app created to help people quickly find interesting activities depending on the location (person location or selected manually). With this service you are always updated with the latest events for every taste.
+This is a REST API for event notifications. This app created to help people quickly find interesting activities depending on the a lot of filters like location (eg. country, city, street, etc.), distance, categories, time interval, etc. With this service you are always updated with the latest events for every taste.
 
 ## Versions API
 
