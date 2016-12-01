@@ -4,7 +4,7 @@ This is a REST API for event notifications. This app created to help people quic
 
 ## Versions API
 
-Before executing HTTP requests you should specify version of the API. Current version of the API 1.
+Before executing HTTP requests you should specify version of the API. Current version of the API 1.0.
 
 ## Getting started
 
