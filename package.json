@@ -6,7 +6,7 @@
   "author": "melisyourhero",
   "license": "ISC",
   "scripts": {
-    "start": "nodemon server",
+    "start": "node server.js",
     "clear": "npm prune",
     "debug": "DEBUG=express* nodemon server",
     "test": "NODE_PATH=. mocha --timeout 10000 ./tests",
