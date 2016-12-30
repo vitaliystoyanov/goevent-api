@@ -56,7 +56,7 @@ app.api = db => {
     // app.use(express.static(path.join(__dirname.split('/').splice(0, 6).join('/'), '/frontend/build')));
 
     // view engine setup
-    app.set('port', config.port || 3000);
+    app.set('port', process.env.PORT || 3000);
     app.engine('jade', require('jade').renderFile);
     app.set('views', path.join(__dirname, '/views'));
     app.set('view engine', 'jade');
