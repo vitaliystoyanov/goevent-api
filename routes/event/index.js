@@ -8,7 +8,7 @@ const locationEvents = require('libs/facebook/location/index').locationEvents;
 const ApplicationError = require('helpers/applicationError').createApplicationError;
 
 const eventRouter = express.Router();
-const client = redis.createClient();
+const client = redis.createClient(process.env.REDIS_URL);
 
 let redisConnection = false;
 
